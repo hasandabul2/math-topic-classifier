@@ -1,0 +1,45 @@
+# ──────────────────────────────────────────────────────────────────────────
+# Render Blueprint — Math Topic Classifier
+# ──────────────────────────────────────────────────────────────────────────
+# Deploy with: Render Dashboard → New → Blueprint → Connect this repo
+# ──────────────────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: math-topic-classifier
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.render
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: math-classifier-db
+          property: connectionString
+      - key: ENDPOINT_URL
+        value: "https://hasandabul-math-topic-classifier-api.hf.space"
+      - key: HF_TOKEN
+        value: ""
+      - key: FRONTEND_URL
+        value: ""
+      - key: GOOGLE_CLIENT_ID
+        value: ""
+      - key: GOOGLE_CLIENT_SECRET
+        value: ""
+      - key: GOOGLE_REDIRECT_URI
+        value: ""
+      - key: IYZICO_API_KEY
+        value: ""
+      - key: IYZICO_SECRET_KEY
+        value: ""
+      - key: IYZICO_BASE_URL
+        value: "sandbox-api.iyzipay.com"
+      - key: PAYMENT_CALLBACK_URL
+        value: ""
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+
+databases:
+  - name: math-classifier-db
+    plan: free
+    databaseName: math_classifier_db
+    user: math_user

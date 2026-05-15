@@ -1,0 +1,79 @@
+# ──────────────────────────────────────────────────────────────────────────
+# Docker Compose — Production Deployment
+# ──────────────────────────────────────────────────────────────────────────
+# Orchestrates the full Math Topic Classifier stack:
+#   1. PostgreSQL database
+#   2. FastAPI backend (Python)
+#   3. React frontend (Nginx)
+#
+# Usage:
+#   docker-compose up --build -d        # Start all services
+#   docker-compose ps                   # Check status
+#   docker-compose logs -f backend      # View backend logs
+#   docker-compose down                 # Stop all services
+#   docker-compose down -v              # Stop + delete database data
+# ──────────────────────────────────────────────────────────────────────────
+
+services:
+  # ── PostgreSQL Database ───────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: math_user
+      POSTGRES_PASSWORD: math_secure_pass_2024
+      POSTGRES_DB: math_classifier_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U math_user -d math_classifier_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── FastAPI Backend ─────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://math_user:math_secure_pass_2024@db:5432/math_classifier_db
+      ENDPOINT_URL: "https://hasandabul-math-topic-classifier-api.hf.space"
+      HF_TOKEN: ""
+      FRONTEND_URL: "http://localhost"
+      GOOGLE_REDIRECT_URI: "http://localhost:8000/auth/google/callback"
+      PAYMENT_CALLBACK_URL: "http://localhost:8000/api/payment/callback"
+      GOOGLE_CLIENT_ID: ""
+      GOOGLE_CLIENT_SECRET: ""
+      IYZICO_API_KEY: ""
+      IYZICO_SECRET_KEY: ""
+      IYZICO_BASE_URL: "sandbox-api.iyzipay.com"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 10s
+      start_period: 15s
+      retries: 5
+
+  # ── React Frontend (Nginx) ──────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend/react-app
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:

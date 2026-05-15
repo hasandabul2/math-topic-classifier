@@ -1,0 +1,59 @@
+# ── Python ────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+sdist/
+develop-eggs/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+var/
+wheels/
+.installed.cfg
+
+# ── Virtual Environments ──────────────────────────────
+.env
+.venv
+env/
+venv/
+ENV/
+
+# ── Node.js ───────────────────────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── IDE ───────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── ML Model files (too large for Git, hosted on HF) ─
+final_model_extracted/
+
+# ── Data files ────────────────────────────────────────
+data/
+
+# ── Notebooks ─────────────────────────────────────────
+notebooks/
+
+# ── Coverage / Testing artifacts ──────────────────────
+.coverage
+.pytest_cache/
+htmlcov/
+
+# ── OS files ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Docker ────────────────────────────────────────────
+*.log

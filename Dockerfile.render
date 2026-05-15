@@ -1,0 +1,80 @@
+# ──────────────────────────────────────────────────────────────────────────
+# Render Dockerfile — Math Topic Classifier (Monolithic)
+# ──────────────────────────────────────────────────────────────────────────
+# Combines React frontend + FastAPI backend into a single container.
+# FastAPI serves both the API and the React static build.
+#
+# Stage 1: Build React app with Vite
+# Stage 2: Install Python dependencies
+# Stage 3: Runtime — serve everything from FastAPI
+# ──────────────────────────────────────────────────────────────────────────
+
+# ── Stage 1: Build React Frontend ─────────────────────────────────────────
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /app
+
+# Copy dependency manifests first (Docker layer caching)
+COPY frontend/react-app/package.json frontend/react-app/package-lock.json ./
+
+# Install dependencies
+RUN npm ci --ignore-scripts
+
+# Copy source code and build
+COPY frontend/react-app/ .
+RUN npm run build
+
+
+# ── Stage 2: Install Python Dependencies ──────────────────────────────────
+FROM python:3.11-slim AS python-builder
+
+WORKDIR /build
+
+# Install build-time OS dependencies (gcc for psycopg2, etc.)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY frontend/requirements.txt .
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+
+# ── Stage 3: Runtime ──────────────────────────────────────────────────────
+FROM python:3.11-slim
+
+LABEL maintainer="Math Topic Classifier Team"
+LABEL description="Full-stack Math Topic Classifier (FastAPI + React)"
+
+WORKDIR /app
+
+# Runtime OS dependency: libpq for psycopg2
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq5 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy installed Python packages from builder
+COPY --from=python-builder /install /usr/local
+
+# Copy application source code
+COPY frontend/app.py .
+COPY frontend/database.py .
+COPY frontend/models.py .
+COPY frontend/.env.example .env
+
+# Copy the React build output
+COPY --from=frontend-builder /app/dist ./static_build
+
+# Create a non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app
+USER appuser
+
+# Expose port (Render sets PORT dynamically)
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8000}/health')" || exit 1
+
+# Run with Uvicorn — use Render's $PORT or fallback to 8000
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-8000} --workers 2"]
