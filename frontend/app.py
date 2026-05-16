@@ -12,7 +12,11 @@ from database import SessionLocal, engine
 from models import Base, User, DbSession, Subscription, ClassificationHistory
 from datetime import timezone
 
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+    print("[*] Database tables created/verified.")
+except Exception as _db_init_err:
+    print(f"[!] DB init warning (will retry on first request): {_db_init_err}")
 # ----------------
 
 from fastapi import FastAPI, Request, Form, HTTPException, status, UploadFile, File
