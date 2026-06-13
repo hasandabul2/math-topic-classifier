@@ -334,9 +334,10 @@ async def google_callback(code: str = None, error: str = None):
 
 @app.get("/health", response_class=JSONResponse)
 async def health():
+    current_mode = "demo (fast)" if os.environ.get("DEMO_FAST_MODE", "0").strip() == "1" else MODEL_MODE
     return {
         "status": "ok",
-        "mode": MODEL_MODE,
+        "mode": current_mode,
         "endpoint": ENDPOINT_URL[:40] + "..." if len(ENDPOINT_URL) > 40 else ENDPOINT_URL or "none (demo)"
     }
 
@@ -439,13 +440,20 @@ def get_real_prediction(question: str) -> dict:
         result_response.raise_for_status()
 
         result_text = ""
+        import json as _json
         for line in result_response.text.strip().split("\n"):
             if line.startswith("data:"):
-                import json as _json
-                data = _json.loads(line[5:].strip())
-                if isinstance(data, list) and len(data) > 0:
-                    result_text = data[0]
-                break
+                raw = line[5:].strip()
+                # Skip heartbeat null lines — keep looking for the real result array
+                if not raw or raw == "null":
+                    continue
+                try:
+                    data = _json.loads(raw)
+                    if isinstance(data, list) and len(data) > 0:
+                        result_text = data[0]
+                        break
+                except Exception:
+                    continue
 
         label = "Algebra"
         score = 0.65
@@ -499,6 +507,8 @@ def get_mock_prediction(question: str):
 
 def get_prediction(question: str) -> dict:
     """Route to real model or mock prediction based on configuration."""
+    if os.environ.get("DEMO_FAST_MODE", "0").strip() == "1":
+        return get_mock_prediction(question)
     if MODEL_MODE == "production":
         return get_real_prediction(question)
     return get_mock_prediction(question)

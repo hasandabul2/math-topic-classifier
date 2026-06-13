@@ -5,7 +5,8 @@ import tailwindcss from '@tailwindcss/vite'
 const backendProxy = {
   target: 'http://127.0.0.1:8000',
   changeOrigin: true,
-  cookieDomainRewrite: '',
+  secure: false,
+  cookieDomainRewrite: 'localhost',
   cookiePathRewrite: '/',
 }
 
