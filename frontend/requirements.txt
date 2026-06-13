@@ -9,3 +9,7 @@ python-dotenv==1.0.0
 SQLAlchemy>=2.0.23
 psycopg2-binary>=2.9.9
 iyzipay>=1.0.46
+pandas
+openpyxl
+easyocr
+opencv-python-headless

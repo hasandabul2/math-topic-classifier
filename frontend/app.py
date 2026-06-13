@@ -584,7 +584,12 @@ async def predict_image(request: Request, file: UploadFile = File(...)):
             tmp.write(contents)
             tmp_path = tmp.name
 
-        reader = easyocr.Reader(["en"], gpu=False, verbose=False)
+        reader = easyocr.Reader(
+            ["en"],
+            gpu=False,
+            verbose=False,
+            model_storage_directory=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".EasyOCR")
+        )
         results = reader.readtext(tmp_path, detail=0)
         os.unlink(tmp_path)
 
