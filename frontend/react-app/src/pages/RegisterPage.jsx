@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { UserPlus, Eye, EyeOff, ArrowRight, CheckCircle } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function RegisterPage() {
     const { register } = useAuth()
+    const { t } = useLanguage()
     const navigate = useNavigate()
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
@@ -39,17 +41,17 @@ export default function RegisterPage() {
                 </div>
                 <div className="relative z-10 flex flex-col justify-center px-16">
                     <h1 className="text-4xl font-extrabold text-white mb-6 leading-tight">
-                        Join the community of<br />
+                        {t('register_heading')}<br />
                         <span className="bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
-                            math enthusiasts
+                            {t('register_heading_highlight')}
                         </span>
                     </h1>
                     <div className="space-y-4">
                         {[
-                            'Classify questions into 8 math topics',
-                            'Track your classification history',
-                            'Export results as CSV/Excel',
-                            'AI-powered with 91%+ accuracy',
+                            t('register_feature_1'),
+                            t('register_feature_2'),
+                            t('register_feature_3'),
+                            t('register_feature_4'),
                         ].map((feature, i) => (
                             <div key={i} className="flex items-center gap-3">
                                 <CheckCircle size={18} className="text-emerald-400 flex-shrink-0" />
@@ -70,8 +72,8 @@ export default function RegisterPage() {
                         <span className="font-extrabold text-2xl text-slate-800">MathClassifier</span>
                     </div>
 
-                    <h2 className="text-3xl font-extrabold text-slate-800 mb-2">Create account</h2>
-                    <p className="text-slate-500 mb-8">Start classifying math questions today</p>
+                    <h2 className="text-3xl font-extrabold text-slate-800 mb-2">{t('register_title')}</h2>
+                    <p className="text-slate-500 mb-8">{t('register_desc')}</p>
 
                     {error && (
                         <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm mb-6 animate-fade-in">
@@ -81,33 +83,33 @@ export default function RegisterPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="reg-username">Username</label>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="reg-username">{t('register_username')}</label>
                             <input
                                 id="reg-username"
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent text-slate-800"
-                                placeholder="Choose a username"
+                                placeholder={t('register_username_placeholder')}
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="reg-email">Email</label>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="reg-email">{t('register_email')}</label>
                             <input
                                 id="reg-email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent text-slate-800"
-                                placeholder="your@email.com"
+                                placeholder={t('register_email_placeholder')}
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="reg-password">Password</label>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="reg-password">{t('register_password')}</label>
                             <div className="relative">
                                 <input
                                     id="reg-password"
@@ -115,7 +117,7 @@ export default function RegisterPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent text-slate-800 pr-12"
-                                    placeholder="Create a password"
+                                    placeholder={t('register_password_placeholder')}
                                     required
                                 />
                                 <button
@@ -139,7 +141,7 @@ export default function RegisterPage() {
                             ) : (
                                 <>
                                     <UserPlus size={18} />
-                                    Create Account
+                                    {t('register_btn')}
                                 </>
                             )}
                         </button>
@@ -147,9 +149,9 @@ export default function RegisterPage() {
 
                     <div className="mt-8 text-center">
                         <p className="text-slate-500 text-sm">
-                            Already have an account?{' '}
+                            {t('register_has_account')}{' '}
                             <Link to="/login" className="text-primary-600 font-semibold hover:text-primary-700">
-                                Sign in <ArrowRight size={14} className="inline" />
+                                {t('register_signin')} <ArrowRight size={14} className="inline" />
                             </Link>
                         </p>
                     </div>

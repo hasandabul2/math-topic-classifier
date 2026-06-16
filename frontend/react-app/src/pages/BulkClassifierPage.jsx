@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import { Upload, FileSpreadsheet, Loader2, Download, AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, X, Sparkles } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
+import { useLanguage } from '../context/LanguageContext'
 import { TOPIC_COLORS } from '../utils/constants'
 import api from '../utils/api'
 
@@ -8,6 +9,7 @@ const ROWS_PER_PAGE = 10
 
 export default function BulkClassifierPage() {
     const { theme } = useTheme()
+    const { t } = useLanguage()
     const isDark = theme === 'dark'
 
     const [file, setFile] = useState(null)
@@ -32,11 +34,11 @@ export default function BulkClassifierPage() {
     const validateFile = (f) => {
         const ext = '.' + f.name.split('.').pop().toLowerCase()
         if (!ACCEPTED.includes(ext)) {
-            setError(`Unsupported file format "${ext}". Please upload a .csv or .xlsx file.`)
+            setError(t('bulk_unsupported'))
             return false
         }
         if (f.size > 10 * 1024 * 1024) {
-            setError('File is too large. Maximum size is 10 MB.')
+            setError(t('bulk_too_large'))
             return false
         }
         return true
@@ -99,12 +101,12 @@ export default function BulkClassifierPage() {
                     setLoading(false)
                 }, 300)
             } else {
-                setError(res.data.error || 'Classification failed')
+                setError(res.data.error || t('classifier_failed'))
                 setLoading(false)
             }
         } catch (err) {
             clearInterval(interval)
-            const msg = err.response?.data?.error || err.message || 'Failed to connect to the server'
+            const msg = err.response?.data?.error || err.message || t('classifier_server_error')
             setError(msg)
             setLoading(false)
         }
@@ -130,7 +132,7 @@ export default function BulkClassifierPage() {
             a.remove()
             window.URL.revokeObjectURL(url)
         } catch (err) {
-            setError('Failed to download results. Please try again.')
+            setError(t('bulk_download_failed'))
         }
     }
 
@@ -160,16 +162,16 @@ export default function BulkClassifierPage() {
             <div className="text-center mb-10 animate-fade-in">
                 <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-4 ${isDark ? 'bg-slate-800 text-primary-200' : 'bg-primary-50 text-primary-700'}`}>
                     <FileSpreadsheet size={14} />
-                    Batch Processing
+                    {t('bulk_badge')}
                 </div>
                 <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-                    Bulk{' '}
+                    {t('bulk_title_1')}{' '}
                     <span className="bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-                        Classification
+                        {t('bulk_title_2')}
                     </span>
                 </h1>
                 <p className={`mt-3 text-lg max-w-xl mx-auto ${subText}`}>
-                    Upload a CSV or Excel file with math questions to classify them all at once
+                    {t('bulk_desc')}
                 </p>
             </div>
 
@@ -216,7 +218,7 @@ export default function BulkClassifierPage() {
                                     className={`inline-flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-all ${isDark ? 'text-slate-400 hover:text-red-400 hover:bg-red-900/20' : 'text-slate-500 hover:text-red-600 hover:bg-red-50'}`}
                                 >
                                     <X size={14} />
-                                    Remove
+                                    {t('bulk_remove')}
                                 </button>
                             </div>
                         ) : (
@@ -226,14 +228,14 @@ export default function BulkClassifierPage() {
                                 </div>
                                 <div>
                                     <p className="text-lg font-semibold">
-                                        Drag & drop your file here
+                                        {t('bulk_drag')}
                                     </p>
                                     <p className={`text-sm mt-1 ${faintText}`}>
-                                        or click to browse — <span className="font-medium">.csv</span> or <span className="font-medium">.xlsx</span>
+                                        {t('bulk_browse')} <span className="font-medium">.csv</span> or <span className="font-medium">.xlsx</span>
                                     </p>
                                 </div>
                                 <p className={`text-xs ${faintText}`}>
-                                    File must contain a <span className={`font-mono px-1.5 py-0.5 rounded ${isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'}`}>question</span> column &middot; Max 10 MB
+                                    {t('bulk_column')} <span className={`font-mono px-1.5 py-0.5 rounded ${isDark ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'}`}>{t('bulk_column_name')}</span> {t('bulk_column_suffix')}
                                 </p>
                             </div>
                         )}
@@ -248,7 +250,7 @@ export default function BulkClassifierPage() {
                                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all btn-press"
                             >
                                 <Sparkles size={18} />
-                                Classify All Questions
+                                {t('bulk_classify_all')}
                             </button>
                         </div>
                     )}
@@ -270,8 +272,8 @@ export default function BulkClassifierPage() {
                         <div className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-6 bg-gradient-to-br from-primary-600 to-purple-600">
                             <Loader2 size={32} className="text-white spinner" />
                         </div>
-                        <h3 className="text-xl font-bold mb-2">Classifying Questions...</h3>
-                        <p className={`text-sm mb-6 ${subText}`}>Processing your file with our AI model</p>
+                        <h3 className="text-xl font-bold mb-2">{t('bulk_classifying')}</h3>
+                        <p className={`text-sm mb-6 ${subText}`}>{t('bulk_processing')}</p>
 
                         {/* Progress bar */}
                         <div className={`w-full h-3 rounded-full overflow-hidden ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`}>
@@ -295,9 +297,9 @@ export default function BulkClassifierPage() {
                                 <CheckCircle2 size={24} />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold">Classification Complete</h3>
+                                <h3 className="text-lg font-bold">{t('bulk_complete')}</h3>
                                 <p className={`text-sm ${subText}`}>
-                                    {results.total} question{results.total !== 1 ? 's' : ''} classified successfully
+                                    {results.total} {t('bulk_questions_classified')}
                                 </p>
                             </div>
                         </div>
@@ -307,7 +309,7 @@ export default function BulkClassifierPage() {
                                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm border transition-all ${isDark ? 'text-slate-300 border-slate-700 hover:bg-slate-800' : 'text-slate-600 border-slate-200 hover:bg-slate-50'}`}
                             >
                                 <Upload size={16} />
-                                New Upload
+                                {t('bulk_new_upload')}
                             </button>
                             <button
                                 id="download-results-btn"
@@ -315,7 +317,7 @@ export default function BulkClassifierPage() {
                                 className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 shadow-lg shadow-emerald-500/25 hover:shadow-xl transition-all btn-press"
                             >
                                 <Download size={16} />
-                                Download Excel
+                                {t('bulk_download')}
                             </button>
                         </div>
                     </div>
@@ -327,9 +329,9 @@ export default function BulkClassifierPage() {
                                 <thead>
                                     <tr className={isDark ? 'bg-slate-800/50' : 'bg-slate-50'}>
                                         <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${faintText}`}>#</th>
-                                        <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${faintText}`}>Question</th>
-                                        <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${faintText}`}>Predicted Category</th>
-                                        <th className={`px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider ${faintText}`}>Confidence</th>
+                                        <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${faintText}`}>{t('bulk_question')}</th>
+                                        <th className={`px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider ${faintText}`}>{t('bulk_predicted_category')}</th>
+                                        <th className={`px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider ${faintText}`}>{t('bulk_confidence')}</th>
                                     </tr>
                                 </thead>
                                 <tbody className={`divide-y ${isDark ? 'divide-slate-800' : 'divide-slate-100'}`}>
@@ -364,7 +366,7 @@ export default function BulkClassifierPage() {
                         {totalPages > 1 && (
                             <div className={`flex items-center justify-between px-6 py-4 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                                 <p className={`text-sm ${subText}`}>
-                                    Showing {page * ROWS_PER_PAGE + 1}–{Math.min((page + 1) * ROWS_PER_PAGE, results.results.length)} of {results.results.length}
+                                    {t('bulk_showing')} {page * ROWS_PER_PAGE + 1}–{Math.min((page + 1) * ROWS_PER_PAGE, results.results.length)} {t('bulk_of')} {results.results.length}
                                 </p>
                                 <div className="flex items-center gap-2">
                                     <button

@@ -3,10 +3,12 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { LogIn, Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function LoginPage() {
     const { login } = useAuth()
     const { theme } = useTheme()
+    const { t } = useLanguage()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
     const [username, setUsername] = useState('')
@@ -53,7 +55,7 @@ export default function LoginPage() {
                 setError(result.error)
             }
         } catch (err) {
-            setError(err.message || 'Connecting to the server failed.')
+            setError(err.message || t('login_server_error'))
         } finally {
             setLoading(false)
         }
@@ -75,15 +77,15 @@ export default function LoginPage() {
                         <span className="text-white text-3xl font-bold">π</span>
                     </div>
                     <h1 className="text-5xl font-extrabold text-white mb-4 leading-tight">
-                        Math Question<br />Classifier
+                        {t('login_title')}<br />{t('login_subtitle')}
                     </h1>
                     <p className="text-xl text-white/80 max-w-md leading-relaxed">
-                        AI-powered classification of mathematical questions into 8 specialized topics
+                        {t('login_desc')}
                     </p>
                     <div className="flex gap-3 mt-8">
-                        {['Algebra', 'Calculus', 'Statistics', 'Topology'].map(t => (
-                            <span key={t} className="px-3 py-1 bg-white/15 backdrop-blur-sm text-white text-xs font-medium rounded-full">
-                                {t}
+                        {['Algebra', 'Calculus', 'Statistics', 'Topology'].map(topicName => (
+                            <span key={topicName} className="px-3 py-1 bg-white/15 backdrop-blur-sm text-white text-xs font-medium rounded-full">
+                                {topicName}
                             </span>
                         ))}
                     </div>
@@ -101,8 +103,8 @@ export default function LoginPage() {
                         <span className={`font-extrabold text-2xl ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>MathClassifier</span>
                     </div>
 
-                    <h2 className="text-3xl font-extrabold mb-2">Welcome back</h2>
-                    <p className={`${mutedText} mb-8`}>Sign in to your account to continue</p>
+                    <h2 className="text-3xl font-extrabold mb-2">{t('login_welcome')}</h2>
+                    <p className={`${mutedText} mb-8`}>{t('login_signin_desc')}</p>
 
                     {error && (
                         <div className={`p-4 rounded-xl text-sm mb-6 animate-fade-in ${isDark ? 'bg-red-900/30 border border-red-800 text-red-100' : 'bg-red-50 border border-red-200 text-red-600'}`}>
@@ -112,20 +114,20 @@ export default function LoginPage() {
 
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className={`block text-sm font-semibold mb-2 ${labelText}`} htmlFor="login-username">Username</label>
+                            <label className={`block text-sm font-semibold mb-2 ${labelText}`} htmlFor="login-username">{t('login_username')}</label>
                             <input
                                 id="login-username"
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent ${isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'}`}
-                                placeholder="Enter your username"
+                                placeholder={t('login_username_placeholder')}
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className={`block text-sm font-semibold mb-2 ${labelText}`} htmlFor="login-password">Password</label>
+                            <label className={`block text-sm font-semibold mb-2 ${labelText}`} htmlFor="login-password">{t('login_password')}</label>
                             <div className="relative">
                                 <input
                                     id="login-password"
@@ -133,7 +135,7 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent pr-12 ${isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-200 text-slate-800'}`}
-                                    placeholder="Enter your password"
+                                    placeholder={t('login_password_placeholder')}
                                     required
                                 />
                                 <button
@@ -157,7 +159,7 @@ export default function LoginPage() {
                             ) : (
                                 <>
                                     <LogIn size={18} />
-                                    Sign In
+                                    {t('login_btn')}
                                 </>
                             )}
                         </button>
@@ -166,7 +168,7 @@ export default function LoginPage() {
                     {/* Divider */}
                     <div className="flex items-center gap-3 my-6">
                         <div className={`flex-1 h-px ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`} />
-                        <span className={`text-xs font-medium ${mutedText}`}>OR</span>
+                        <span className={`text-xs font-medium ${mutedText}`}>{t('login_or')}</span>
                         <div className={`flex-1 h-px ${isDark ? 'bg-slate-800' : 'bg-slate-200'}`} />
                     </div>
 
@@ -181,14 +183,14 @@ export default function LoginPage() {
                             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                         </svg>
-                        Sign in with Google
+                        {t('login_google')}
                     </a>
 
                     <div className="mt-6 text-center">
                         <p className={`${mutedText} text-sm`}>
-                            Don't have an account?{' '}
+                            {t('login_no_account')}{' '}
                             <Link to="/register" className="text-primary-600 font-semibold hover:text-primary-700">
-                                Create one <ArrowRight size={14} className="inline" />
+                                {t('login_create')} <ArrowRight size={14} className="inline" />
                             </Link>
                         </p>
                     </div>

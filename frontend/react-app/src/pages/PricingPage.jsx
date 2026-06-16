@@ -1,72 +1,74 @@
 import { useState, useRef, useEffect } from 'react'
 import { Check, Star, Zap, Crown, Loader2, CreditCard } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
-
-const tiers = [
-  {
-    key: 'free',
-    name: 'Free',
-    price: 0,
-    icon: Zap,
-    color: 'from-slate-500 to-slate-600',
-    features: [
-      'Up to 10 classifications per day',
-      'Basic prediction accuracy',
-      'Standard support',
-      '7-day history',
-    ],
-    cta: 'Current Plan',
-    popular: false,
-    payable: false,
-  },
-  {
-    key: 'pro',
-    name: 'Pro',
-    price: 9.99,
-    icon: Star,
-    color: 'from-primary-500 to-primary-600',
-    features: [
-      'Unlimited classifications',
-      'Advanced prediction accuracy',
-      'Priority support',
-      '30-day history',
-      'Export results as CSV',
-      'Custom analytics',
-    ],
-    cta: 'Upgrade to Pro',
-    popular: true,
-    payable: true,
-  },
-  {
-    key: 'premium',
-    name: 'Premium',
-    price: 19.99,
-    icon: Crown,
-    color: 'from-amber-500 to-orange-600',
-    features: [
-      'Unlimited classifications',
-      'Highest prediction accuracy',
-      '24/7 Premium support',
-      'Unlimited history',
-      'Export as CSV/PDF',
-      'Custom analytics & reports',
-      'API access',
-      'Batch processing',
-      'Admin dashboard',
-    ],
-    cta: 'Upgrade to Premium',
-    popular: false,
-    payable: true,
-  },
-]
+import { useLanguage } from '../context/LanguageContext'
 
 export default function PricingPage() {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(null)
   const [checkoutHtml, setCheckoutHtml] = useState('')
   const [showCheckout, setShowCheckout] = useState(false)
   const [error, setError] = useState('')
   const checkoutRef = useRef(null)
+
+  const tiers = [
+    {
+      key: 'free',
+      name: t('pricing_free'),
+      price: 0,
+      icon: Zap,
+      color: 'from-slate-500 to-slate-600',
+      features: [
+        t('pricing_f_10_per_day'),
+        t('pricing_f_basic_accuracy'),
+        t('pricing_f_standard_support'),
+        t('pricing_f_7day_history'),
+      ],
+      cta: t('pricing_current'),
+      popular: false,
+      payable: false,
+    },
+    {
+      key: 'pro',
+      name: t('pricing_pro'),
+      price: 9.99,
+      icon: Star,
+      color: 'from-primary-500 to-primary-600',
+      features: [
+        t('pricing_f_unlimited'),
+        t('pricing_f_advanced_accuracy'),
+        t('pricing_f_priority_support'),
+        t('pricing_f_30day_history'),
+        t('pricing_f_csv_export'),
+        t('pricing_f_analytics'),
+      ],
+      cta: t('pricing_upgrade_pro'),
+      popular: true,
+      payable: true,
+    },
+    {
+      key: 'premium',
+      name: t('pricing_premium'),
+      price: 19.99,
+      icon: Crown,
+      color: 'from-amber-500 to-orange-600',
+      features: [
+        t('pricing_f_unlimited'),
+        t('pricing_f_highest_accuracy'),
+        t('pricing_f_premium_support'),
+        t('pricing_f_unlimited_history'),
+        t('pricing_f_csv_pdf'),
+        t('pricing_f_reports'),
+        t('pricing_f_api'),
+        t('pricing_f_batch'),
+        t('pricing_f_admin'),
+      ],
+      cta: t('pricing_upgrade_premium'),
+      popular: false,
+      payable: true,
+    },
+  ]
 
   // When checkout HTML changes, inject it and execute scripts
   useEffect(() => {
@@ -89,7 +91,7 @@ export default function PricingPage() {
 
   const handleUpgrade = async (tierKey) => {
     if (!user) {
-      setError('Please log in first to upgrade')
+      setError(t('pricing_login_first'))
       return
     }
 
@@ -119,10 +121,10 @@ export default function PricingPage() {
         // Redirect to iyzico's hosted payment page
         window.location.href = data.paymentPageUrl
       } else {
-        setError(data.error || 'Failed to initialize payment')
+        setError(data.error || t('pricing_payment_failed'))
       }
     } catch (err) {
-      setError('Failed to connect to payment service')
+      setError(t('pricing_connect_failed'))
     } finally {
       setLoading(null)
     }
@@ -133,11 +135,11 @@ export default function PricingPage() {
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary-50 text-primary-700 rounded-full text-sm font-medium mb-4">
           <CreditCard size={14} />
-          Powered by iyzico
+          {t('pricing_badge')}
         </div>
-        <h1 className="text-4xl font-extrabold text-slate-800 mb-3">Simple, transparent pricing</h1>
+        <h1 className="text-4xl font-extrabold text-slate-800 mb-3">{t('pricing_title')}</h1>
         <p className="text-lg text-slate-500 max-w-lg mx-auto">
-          Choose the plan that fits your needs. Secure payments via iyzico.
+          {t('pricing_desc')}
         </p>
       </div>
 
@@ -153,7 +155,7 @@ export default function PricingPage() {
           const Icon = tier.icon
           return (
             <div
-              key={tier.name}
+              key={tier.key}
               className={`relative bg-white rounded-2xl border p-8 card-hover ${
                 tier.popular
                   ? 'border-primary-300 shadow-xl shadow-primary-500/10 ring-2 ring-primary-500/20'
@@ -163,7 +165,7 @@ export default function PricingPage() {
               {tier.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <span className="px-4 py-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs font-bold rounded-full shadow-md">
-                    Most Popular
+                    {t('pricing_most_popular')}
                   </span>
                 </div>
               )}
@@ -174,8 +176,8 @@ export default function PricingPage() {
 
               <h3 className="text-xl font-bold text-slate-800 mb-1">{tier.name}</h3>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-4xl font-extrabold text-slate-900">{tier.price === 0 ? 'Free' : `₺${tier.price}`}</span>
-                {tier.price > 0 && <span className="text-slate-400 text-sm">/month</span>}
+                <span className="text-4xl font-extrabold text-slate-900">{tier.price === 0 ? t('pricing_free') : `₺${tier.price}`}</span>
+                {tier.price > 0 && <span className="text-slate-400 text-sm">{t('pricing_month')}</span>}
               </div>
 
               <ul className="space-y-3 mb-8">
@@ -200,7 +202,7 @@ export default function PricingPage() {
                   {loading === tier.key ? (
                     <>
                       <Loader2 size={16} className="spinner" />
-                      Processing...
+                      {t('pricing_processing')}
                     </>
                   ) : (
                     <>
@@ -221,15 +223,15 @@ export default function PricingPage() {
 
       {/* Sandbox test card info */}
       <div className="mt-12 max-w-md mx-auto p-5 bg-amber-50 border border-amber-200 rounded-2xl">
-        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">🧪 Sandbox Test Mode</p>
-        <p className="text-sm text-amber-800 mb-3">Use these test card details:</p>
+        <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-2">{t('pricing_sandbox')}</p>
+        <p className="text-sm text-amber-800 mb-3">{t('pricing_sandbox_desc')}</p>
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div>
-            <p className="text-xs text-amber-600 font-medium">Card Number</p>
+            <p className="text-xs text-amber-600 font-medium">{t('pricing_card_number')}</p>
             <p className="font-mono font-bold text-amber-900">5528 7900 0000 0008</p>
           </div>
           <div>
-            <p className="text-xs text-amber-600 font-medium">Expiry</p>
+            <p className="text-xs text-amber-600 font-medium">{t('pricing_expiry')}</p>
             <p className="font-mono font-bold text-amber-900">12/30</p>
           </div>
           <div>
@@ -246,7 +248,7 @@ export default function PricingPage() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
               <div className="flex items-center gap-3">
                 <CreditCard size={20} className="text-primary-600" />
-                <h3 className="font-bold text-slate-800">Secure Payment</h3>
+                <h3 className="font-bold text-slate-800">{t('pricing_secure_payment')}</h3>
               </div>
               <button
                 onClick={() => { setShowCheckout(false); setCheckoutHtml(''); }}

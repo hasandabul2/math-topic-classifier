@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Clock, Search, Trash2, Download, ArrowUpDown } from 'lucide-react'
 import TopicBadge from '../components/TopicBadge'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function HistoryPage() {
+    const { t } = useLanguage()
     const [history, setHistory] = useState([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState('')
@@ -52,8 +54,8 @@ export default function HistoryPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-slate-800">Classification History</h1>
-                    <p className="text-slate-500 mt-1">{history.length} total classifications</p>
+                    <h1 className="text-3xl font-extrabold text-slate-800">{t('history_title')}</h1>
+                    <p className="text-slate-500 mt-1">{history.length} {t('history_total')}</p>
                 </div>
                 <button
                     onClick={exportCSV}
@@ -61,7 +63,7 @@ export default function HistoryPage() {
                     className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 transition-all shadow-sm disabled:opacity-50"
                 >
                     <Download size={16} />
-                    Export CSV
+                    {t('history_export')}
                 </button>
             </div>
 
@@ -74,14 +76,14 @@ export default function HistoryPage() {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search questions or topics..."
+                        placeholder={t('history_search')}
                         className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-400 text-sm"
                     />
                 </div>
                 <button
                     onClick={() => setSortOrder(s => s === 'desc' ? 'asc' : 'desc')}
                     className="px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all"
-                    title={`Sort ${sortOrder === 'desc' ? 'oldest first' : 'newest first'}`}
+                    title={sortOrder === 'desc' ? t('history_sort_oldest') : t('history_sort_newest')}
                 >
                     <ArrowUpDown size={18} />
                 </button>
@@ -95,8 +97,8 @@ export default function HistoryPage() {
             ) : filtered.length === 0 ? (
                 <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-16 text-center">
                     <Clock size={48} className="mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-500 mb-2">No history yet</h3>
-                    <p className="text-sm text-slate-400">Classified questions will appear here</p>
+                    <h3 className="text-lg font-semibold text-slate-500 mb-2">{t('history_empty')}</h3>
+                    <p className="text-sm text-slate-400">{t('history_empty_desc')}</p>
                 </div>
             ) : (
                 <div className="space-y-3">

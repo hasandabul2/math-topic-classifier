@@ -4,9 +4,11 @@ import TopicBadge from '../components/TopicBadge'
 import ConfidenceBar from '../components/ConfidenceBar'
 import { SAMPLE_QUESTIONS, TOPIC_COLORS } from '../utils/constants'
 import { useTheme } from '../context/ThemeContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function ClassifierPage() {
     const { theme } = useTheme()
+    const { t } = useLanguage()
     const [question, setQuestion] = useState('')
     const [loading, setLoading] = useState(false)
     const [result, setResult] = useState(null)
@@ -73,10 +75,10 @@ export default function ClassifierPage() {
             if (data.success) {
                 processResult(data)
             } else {
-                setError(data.error || 'Classification failed')
+                setError(data.error || t('classifier_failed'))
             }
         } catch (err) {
-            setError('Failed to connect to the server')
+            setError(t('classifier_server_error'))
         } finally {
             setLoading(false)
         }
@@ -107,10 +109,10 @@ export default function ClassifierPage() {
                 setQuestion(data.extracted_text || '')
                 processResult(data)
             } else {
-                setError(data.error || 'OCR classification failed')
+                setError(data.error || t('classifier_ocr_failed'))
             }
         } catch (err) {
-            setError('Failed to connect to the server')
+            setError(t('classifier_server_error'))
         } finally {
             setOcrLoading(false)
             setLoading(false)
@@ -123,7 +125,7 @@ export default function ClassifierPage() {
 
         const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/bmp']
         if (!allowed.includes(file.type)) {
-            setError('Unsupported image format. Use PNG, JPG, or WEBP.')
+            setError(t('classifier_unsupported_format'))
             return
         }
 
@@ -163,16 +165,16 @@ export default function ClassifierPage() {
             <div className="text-center mb-10 animate-fade-in">
                 <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-4 ${isDark ? 'bg-slate-800 text-primary-200' : 'bg-primary-50 text-primary-700'}`}>
                     <Sparkles size={14} />
-                    AI-Powered Classification
+                    {t('classifier_badge')}
                 </div>
                 <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight">
-                    Math Question{' '}
+                    {t('classifier_title_1')}{' '}
                     <span className="bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-                        Classifier
+                        {t('classifier_title_2')}
                     </span>
                 </h1>
                 <p className={`mt-3 text-lg max-w-xl mx-auto ${subText}`}>
-                    Enter any mathematical question and our AI will classify it into the correct topic
+                    {t('classifier_desc')}
                 </p>
             </div>
 
@@ -185,8 +187,8 @@ export default function ClassifierPage() {
                             <BookOpen size={20} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold">Enter Question</h2>
-                            <p className={`text-sm ${faintText}`}>Type or paste a math problem</p>
+                            <h2 className="text-xl font-bold">{t('classifier_enter')}</h2>
+                            <p className={`text-sm ${faintText}`}>{t('classifier_enter_sub')}</p>
                         </div>
                     </div>
 
@@ -196,12 +198,12 @@ export default function ClassifierPage() {
                             value={question}
                             onChange={(e) => setQuestion(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="e.g., Find the eigenvalues of the matrix [[4,1],[6,-1]]"
+                            placeholder={t('classifier_placeholder')}
                             rows={6}
                             className={`w-full px-5 py-4 border rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent resize-none text-base leading-relaxed ${isDark ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-800'}`}
                         />
                         <div className={`absolute bottom-3 right-3 text-xs ${faintText}`}>
-                            Ctrl+Enter to classify
+                            {t('classifier_ctrl_enter')}
                         </div>
                     </div>
 
@@ -218,12 +220,12 @@ export default function ClassifierPage() {
                             {loading && !ocrLoading ? (
                                 <>
                                     <Loader2 size={18} className="spinner" />
-                                    Classifying...
+                                    {t('classifier_classifying')}
                                 </>
                             ) : (
                                 <>
                                     <Sparkles size={18} />
-                                    Classify Question
+                                    {t('classifier_btn')}
                                 </>
                             )}
                         </button>
@@ -232,17 +234,17 @@ export default function ClassifierPage() {
                             id="random-btn"
                             onClick={loadRandom}
                             className={`px-4 py-3.5 rounded-xl font-medium transition-all border flex items-center gap-2 ${isDark ? 'text-primary-200 bg-slate-900 border-slate-800 hover:bg-slate-800' : 'text-primary-600 bg-primary-50 border-primary-200 hover:bg-primary-100'}`}
-                            title="Load a random question"
+                            title={t('classifier_random')}
                         >
                             <Shuffle size={18} />
-                            <span className="hidden sm:inline">Random</span>
+                            <span className="hidden sm:inline">{t('classifier_random')}</span>
                         </button>
                     </div>
 
                     {/* OCR Image Upload Section */}
                     <div className={`mt-6 pt-6 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
                         <p className={`text-xs font-medium uppercase tracking-wider mb-3 ${faintText}`}>
-                            📷 Or upload an image of a math problem
+                            {t('classifier_upload_label')}
                         </p>
 
                         <input
@@ -262,7 +264,7 @@ export default function ClassifierPage() {
                                 }`}
                             >
                                 <Camera size={20} />
-                                <span className="font-medium">Upload Image (OCR)</span>
+                                <span className="font-medium">{t('classifier_upload_btn')}</span>
                             </button>
                         ) : (
                             <div className={`rounded-xl border overflow-hidden ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
@@ -297,12 +299,12 @@ export default function ClassifierPage() {
                                         {ocrLoading ? (
                                             <>
                                                 <Loader2 size={14} className="spinner" />
-                                                Scanning...
+                                                {t('classifier_scanning')}
                                             </>
                                         ) : (
                                             <>
                                                 <Camera size={14} />
-                                                Scan & Classify
+                                                {t('classifier_scan_btn')}
                                             </>
                                         )}
                                     </button>
@@ -313,7 +315,7 @@ export default function ClassifierPage() {
 
                     {/* Quick examples */}
                     <div className={`mt-6 pt-6 border-t ${isDark ? 'border-slate-800' : 'border-slate-100'}`}>
-                        <p className={`text-xs font-medium uppercase tracking-wider mb-3 ${faintText}`}>Try an example</p>
+                        <p className={`text-xs font-medium uppercase tracking-wider mb-3 ${faintText}`}>{t('classifier_try_example')}</p>
                         <div className="flex flex-wrap gap-2">
                             {SAMPLE_QUESTIONS.slice(0, 4).map((q, i) => (
                                 <button
@@ -335,8 +337,8 @@ export default function ClassifierPage() {
                             <Lightbulb size={20} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold">Prediction</h2>
-                            <p className={`text-sm ${faintText}`}>AI classification result</p>
+                            <h2 className="text-xl font-bold">{t('classifier_prediction')}</h2>
+                            <p className={`text-sm ${faintText}`}>{t('classifier_prediction_sub')}</p>
                         </div>
                     </div>
 
@@ -351,9 +353,9 @@ export default function ClassifierPage() {
                             <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-5 ${isDark ? 'bg-slate-800 text-slate-600' : 'bg-slate-100 text-slate-300'}`}>
                                 <Sparkles size={32} />
                             </div>
-                            <h3 className={`text-lg font-semibold mb-2 ${faintText}`}>No prediction yet</h3>
+                            <h3 className={`text-lg font-semibold mb-2 ${faintText}`}>{t('classifier_no_prediction')}</h3>
                             <p className={`text-sm max-w-[250px] ${faintText}`}>
-                                Enter a mathematical question and click "Classify" to see the AI prediction
+                                {t('classifier_no_prediction_desc')}
                             </p>
                         </div>
                     )}
@@ -365,7 +367,7 @@ export default function ClassifierPage() {
                                 <div className={`p-4 border rounded-xl ${isDark ? 'bg-cyan-900/20 border-cyan-800 text-cyan-100' : 'bg-cyan-50 border-cyan-200 text-cyan-800'}`}>
                                     <div className="flex items-center gap-2 mb-2">
                                         <Camera size={14} className={isDark ? 'text-cyan-200' : 'text-cyan-600'} />
-                                        <span className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-cyan-100' : 'text-cyan-700'}`}>Extracted Text (OCR)</span>
+                                        <span className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-cyan-100' : 'text-cyan-700'}`}>{t('classifier_extracted_text')}</span>
                                     </div>
                                     <p className="text-sm leading-relaxed">{result.extractedText}</p>
                                 </div>
@@ -373,17 +375,17 @@ export default function ClassifierPage() {
 
                             {/* Main prediction */}
                             <div className={`text-center py-6 px-4 rounded-xl border ${isDark ? 'bg-slate-900 border-slate-800' : 'bg-gradient-to-br from-slate-50 to-primary-50/30 border-slate-100'}`}>
-                                <p className={`text-xs font-medium uppercase tracking-wider mb-3 ${faintText}`}>Predicted Topic</p>
+                                <p className={`text-xs font-medium uppercase tracking-wider mb-3 ${faintText}`}>{t('classifier_predicted_topic')}</p>
                                 <TopicBadge topic={result.topic} size="lg" />
                                 <div className="mt-4 flex items-center justify-center gap-2">
                                     <div className={`text-3xl font-extrabold ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>{result.confidence.toFixed(1)}%</div>
-                                    <span className={`text-sm font-medium ${faintText}`}>confidence</span>
+                                    <span className={`text-sm font-medium ${faintText}`}>{t('classifier_confidence')}</span>
                                 </div>
                             </div>
 
                             {/* Confidence Bars */}
                             <div>
-                                <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${faintText}`}>Score Breakdown</h3>
+                                <h3 className={`text-sm font-semibold uppercase tracking-wider mb-4 ${faintText}`}>{t('classifier_score_breakdown')}</h3>
                                 <div className="space-y-4">
                                     {result.allScores.map((s, i) => (
                                         <ConfidenceBar key={s.topic} topic={s.topic} confidence={s.confidence} rank={i} />
@@ -396,7 +398,7 @@ export default function ClassifierPage() {
                                 <div className={`p-4 border rounded-xl ${isDark ? 'bg-amber-900/20 border-amber-800 text-amber-100' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
                                     <div className="flex items-center gap-2 mb-2">
                                         <Lightbulb size={14} className={isDark ? 'text-amber-200' : 'text-amber-600'} />
-                                        <span className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-amber-100' : 'text-amber-700'}`}>XAI Rationale</span>
+                                        <span className={`text-xs font-semibold uppercase tracking-wider ${isDark ? 'text-amber-100' : 'text-amber-700'}`}>{t('classifier_xai_rationale')}</span>
                                     </div>
                                     <p className="text-sm leading-relaxed">{result.rationale}</p>
                                     {result.keywords.length > 0 && (

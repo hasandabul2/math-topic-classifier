@@ -1,12 +1,14 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { Brain, FileSpreadsheet, History, CreditCard, Shield, LogOut, Menu, X, Moon, Sun } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
+import { Brain, FileSpreadsheet, History, CreditCard, Shield, LogOut, Menu, X, Moon, Sun, Globe } from 'lucide-react'
 import { useState } from 'react'
 
 export default function Navbar() {
     const { user, logout } = useAuth()
     const { theme, toggleTheme } = useTheme()
+    const { language, toggleLanguage, t } = useLanguage()
     const location = useLocation()
     const navigate = useNavigate()
     const [mobileOpen, setMobileOpen] = useState(false)
@@ -17,11 +19,11 @@ export default function Navbar() {
     }
 
     const navItems = [
-        { path: '/', label: 'Classifier', icon: Brain },
-        { path: '/bulk', label: 'Bulk', icon: FileSpreadsheet },
-        { path: '/history', label: 'History', icon: History },
-        { path: '/pricing', label: 'Pricing', icon: CreditCard },
-        ...(user?.role === 'admin' ? [{ path: '/admin', label: 'Admin', icon: Shield }] : []),
+        { path: '/', label: t('nav_classifier'), icon: Brain },
+        { path: '/bulk', label: t('nav_bulk'), icon: FileSpreadsheet },
+        { path: '/history', label: t('nav_history'), icon: History },
+        { path: '/pricing', label: t('nav_pricing'), icon: CreditCard },
+        ...(user?.role === 'admin' ? [{ path: '/admin', label: t('nav_admin'), icon: Shield }] : []),
     ]
 
     const isDark = theme === 'dark'
@@ -61,7 +63,7 @@ export default function Navbar() {
                         ))}
                     </div>
 
-                    {/* User info + Logout */}
+                    {/* User info + Language + Theme + Logout */}
                     <div className="hidden md:flex items-center gap-3">
                         <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${chipBg}`}>
                             <div className="w-6 h-6 rounded-full gradient-bg flex items-center justify-center">
@@ -69,6 +71,18 @@ export default function Navbar() {
                             </div>
                             <span className={`text-sm font-medium ${isDark ? 'text-slate-100' : 'text-slate-700'}`}>{user?.username}</span>
                         </div>
+                        {/* Language Toggle */}
+                        <button
+                            onClick={toggleLanguage}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all border ${isDark
+                                ? 'border-slate-700 text-slate-200 hover:bg-slate-800 hover:border-slate-600'
+                                : 'border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-slate-300'
+                                }`}
+                            title={language === 'en' ? 'Türkçeye çevir' : 'Switch to English'}
+                        >
+                            <Globe size={14} />
+                            {language === 'en' ? 'TR' : 'EN'}
+                        </button>
                         <button
                             onClick={toggleTheme}
                             className={`p-2 rounded-lg transition-all ${isDark ? 'text-amber-300 hover:bg-slate-800' : 'text-slate-500 hover:bg-slate-100'}`}
@@ -79,7 +93,7 @@ export default function Navbar() {
                         <button
                             onClick={handleLogout}
                             className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                            title="Logout"
+                            title={t('nav_logout')}
                         >
                             <LogOut size={18} />
                         </button>
@@ -115,13 +129,23 @@ export default function Navbar() {
                                 {label}
                             </Link>
                         ))}
+                        {/* Language toggle in mobile menu */}
+                        <div className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium w-full ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
+                            <button
+                                onClick={() => { toggleLanguage(); setMobileOpen(false) }}
+                                className={`flex items-center gap-3 w-full text-left ${isDark ? 'hover:text-primary-300' : 'hover:text-slate-900'}`}
+                            >
+                                <Globe size={18} />
+                                {language === 'en' ? 'Türkçe' : 'English'}
+                            </button>
+                        </div>
                         <div className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium w-full ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>
                             <button
                                 onClick={() => { toggleTheme(); setMobileOpen(false) }}
                                 className={`flex items-center gap-3 w-full text-left ${isDark ? 'hover:text-amber-300' : 'hover:text-slate-900'}`}
                             >
                                 {isDark ? <Sun size={18} /> : <Moon size={18} />}
-                                {isDark ? 'Light mode' : 'Dark mode'}
+                                {isDark ? t('nav_light_mode') : t('nav_dark_mode')}
                             </button>
                         </div>
                         <hr className={`${isDark ? 'border-slate-800' : 'border-slate-100'}`} />
@@ -130,7 +154,7 @@ export default function Navbar() {
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 w-full ${isDark ? 'hover:bg-red-900/30' : 'hover:bg-red-50'}`}
                         >
                             <LogOut size={18} />
-                            Logout
+                            {t('nav_logout')}
                         </button>
                     </div>
                 </div>
