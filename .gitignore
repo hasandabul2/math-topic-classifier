@@ -57,3 +57,6 @@ Thumbs.db
 
 # ── Docker ────────────────────────────────────────────
 *.log
+frontend/math_classifier.db
+frontend/math_classifier.db-journal
+frontend/.EasyOCR/
