@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://math_user:math_secure_pass_2024@db:5432/math_classifier_db
-      ENDPOINT_URL: "https://hasandabul-math-topic-classifier-api.hf.space"
+      ENDPOINT_URL: "https://hasandabul-math-topic-classifier.hf.space"
       HF_TOKEN: ""
       FRONTEND_URL: "http://localhost"
       GOOGLE_REDIRECT_URI: "http://localhost:8000/auth/google/callback"

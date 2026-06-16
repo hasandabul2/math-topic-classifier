@@ -16,7 +16,7 @@ services:
           name: math-classifier-db
           property: connectionString
       - key: ENDPOINT_URL
-        value: "https://hasandabul-math-topic-classifier-api.hf.space"
+        value: "https://hasandabul-math-topic-classifier.hf.space"
       - key: HF_TOKEN
         value: ""
       - key: FRONTEND_URL

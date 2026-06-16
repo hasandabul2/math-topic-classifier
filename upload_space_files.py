@@ -2,7 +2,7 @@
 from huggingface_hub import HfApi
 
 api = HfApi()
-space_id = "hasandabul/math-topic-classifier-api"
+space_id = "hasandabul/Math-Topic-Classifier"
 
 # Upload hf_space_app.py as app.py in the Space
 print("[1/2] Uploading app.py ...")

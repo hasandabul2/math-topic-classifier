@@ -1,7 +1,7 @@
 """Quick test: call the HF Space Gradio API end-to-end."""
 import requests, json, time
 
-base = "https://hasandabul-math-topic-classifier-api.hf.space"
+base = "https://hasandabul-math-topic-classifier.hf.space"
 
 # Step 1: Submit
 r = requests.post(f"{base}/gradio_api/call/predict", json={"data": ["Find the derivative of x^2"]}, timeout=30)
