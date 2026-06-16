@@ -15,8 +15,7 @@ api.upload_file(
 
 # Create and upload requirements.txt
 print("[2/2] Uploading requirements.txt ...")
-requirements = """torch
-transformers
+requirements = """transformers
 peft
 bitsandbytes
 accelerate
